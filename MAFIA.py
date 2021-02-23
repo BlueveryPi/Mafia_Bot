@@ -254,6 +254,7 @@ async def 참가자(ctx):
             txt+=mtn(gamer)+"님과 함께하고 계십니다."
     await ctx.channel.send(txt)
 
+'''
 @bot.command()
 async def 재시작(ctx):
     global on_game
@@ -264,7 +265,7 @@ async def 재시작(ctx):
     gamers=[]
     gamers_names=[]
     await ctx.channel.send("재시작이 완료되었습니다.")
-    
+'''
     
 def mtn(member):
     return str(member)[0:len(str(member))-5]
