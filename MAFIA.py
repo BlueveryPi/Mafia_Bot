@@ -92,7 +92,7 @@ async def 참가(ctx):
             gamers_names.append(mtn(ctx.message.author))
             if len(gamers)==1:
                 await ctx.channel.send((ctx.message.author).mention+"님께서 마피아 게임을 개최하셨습니다.")
-                await timer(ctx)
+                await start(ctx)
             else:
                 await ctx.channel.send((ctx.message.author).mention+"님께서 "+gamers[0].mention+"님의 게임에 참가하셨습니다.")
         else:
