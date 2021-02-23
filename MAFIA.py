@@ -1,7 +1,7 @@
 import discord, asyncio, math, random
 from discord.ext import commands
 
-token="???"
+token="Nzc0OTYyNzM2ODg3MTAzNTI4.X6faSg.4L64A5py9klChy94TnWcURSN-vg"
 game=discord.Game("마피아")
 bot=commands.Bot(command_prefix="!", status=discord.Status.online, activity=game, help_command=None)
 on_game=False
@@ -19,6 +19,7 @@ cop_chat=0
 people=[]
 gamers_same=[]
 
+timers={}
 
 def clear():
     global stage
@@ -38,11 +39,17 @@ def clear():
 
 async def start(ctx):
     global on_game
-    
-    await asyncio.sleep(300)
-    if on_game==False:
-        await ctx.channel.send("5분간 활동이 없어 게임이 종료되었습니다.")
+    global timers
+
+    timers[ctx.channel]=True
+    await asyncio.sleep(600)
+    if timers[ctx.channel]==True and on_game==False:
+        await ctx.channel.send("10분간 활동이 없어 게임을 종료합니다.")
         clear()
+
+async def restart(ctx):
+    timers[ctx,channel]=False
+    await start(ctx)
         
 @bot.event
 async def on_ready():
@@ -72,7 +79,6 @@ async def 마피아(ctx):
                         txt+=gamer.mention+"님과의 마피아 게임을 시작합니다.\n"
                         await ctx.channel.send(txt)
                         await game_start(ctx)
-                        await start(ctx)
             else:
                 await ctx.channel.send("참가자의 수가 적어 게임을 시작할 수 없습니다.")
         else:
@@ -95,8 +101,10 @@ async def 참가(ctx):
                 await start(ctx)
             else:
                 await ctx.channel.send((ctx.message.author).mention+"님께서 "+gamers[0].mention+"님의 게임에 참가하셨습니다.")
+                await restart(ctx)
         else:
             await ctx.channel.send((ctx.message.author).mention+"님께서는 이미 게임에 참가하셨습니다.")
+            await restart(ctx)
     else:
         await ctx.channel.send("이미 게임이 시작하였습니다. 게임이 끝난 뒤에 참가해 주세요.")
 
@@ -109,6 +117,7 @@ async def 탈주(ctx):
         await ctx.channel.send((ctx.message.author).mention+"님께서 게임을 떠났습니다.")
         gamers.remove(ctx.message.author)
         gamers_names.remove(mtn(ctx.message.author))
+        await restart(ctx)
     elif on_game==True:
         await ctx.channel.send("게임이 진행 중입니다. 시민으로써의 의무를 다하세요.")
     elif not(ctx.message.author in gamers):
