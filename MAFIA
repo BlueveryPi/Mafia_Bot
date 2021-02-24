@@ -48,12 +48,19 @@ async def start(ctx):
         clear()
 
 async def restart(ctx):
-    timers[ctx,channel]=False
+    timers[ctx.channel]=False
     await start(ctx)
         
 @bot.event
 async def on_ready():
     print("ready")
+
+@bot.command()
+async def 도움(ctx):
+    embed=discord.Embed(title="도움말", description="!도움: 이 메세지를 전송함\n\n!참가: 현재 마피아 게임에 참가하거나 새 게임을 시작함.\n\n!마피아: 개최자(게임을 시작한 사람)만 사용 가능. 게임을 시작.\n\n!참가자: 현재 참가자들을 보여줌.\n\n!탈주: ???:이타치가 왜 강한지 아나?\n\n")
+    embed.add_field(name="특수 명령어", value="!지목: 마피아 채널의 마피아만 사용 가능. 마피아의 시간에 목표를 지목함.\n\n!치료: 의사 채널의 의사만 사용 가능. 지목한 사람을 살림.\n\n!조사: 경찰 채널의 경찰만 사용 가능. 지목한 사람이 마피아인지를 알려줌.", inline=False)
+    embed.set_footer(text="10분간 대기상태에서 활동이 없을시 게임이 중지됨.")
+    await ctx.channel.send(embed=embed)
 
 @bot.command()
 async def 마피아(ctx):
