@@ -456,6 +456,8 @@ async def game_start(ctx):
                     gamers_names.remove(killed)
                     await ctx.channel.send(gamers[gamers_names.index(killed)].mention+"님께서 사망하셨습니다.")
             else:
+                print(gamers_names)
+                print(gamers)
                 await ctx.channel.send(gamers[gamers_names.index(killed)].mention+"님께서 사망하셨습니다.")
                 gamers.remove(gamers[gamers_names.index(killed)])
                 gamers_names.remove(killed)
@@ -474,14 +476,23 @@ async def game_start(ctx):
             while add(votes.values())<len(gamers):
                 await asyncio.sleep(0.3)
 
-            done=sorted(votes.values())[0]
-            killed=[k for k, v in votes.items() if v == done][0]
-            await ctx.channel.send("투표가 완료되었습니다! 총 "+str(done)+"표를 받으신 "+killed.mention+"님, 10초 안에 한마디 남기고 가시죠!")
-            await asyncio.sleep(10)
+            done=sorted(votes.values())
+            killed=[k for k, v in votes.items() if v == done[0]]
+
+            txt=""
+            if done[0]==done[1]:
+                for person in killed:
+                    txt+=killed[person].mention+"님,"
+                txt+="\b"
+                await ctx.channel.send("투표가 완료되었습니다!"+txt+"께서 "+str(done[0])+"표로 같은 수의 투표를 받아 아무도 죽지 않았습니다.")
+
+            else:
+                await ctx.channel.send("투표가 완료되었습니다! 총 "+str(done[0])+"표를 받으신 "+killed[0].mention+"님, 10초 안에 한마디 남기고 가시죠!")
+                await asyncio.sleep(10)
             
-            gamers.remove(killed)
-            gamers_names.remove(mtn(killed))
-            await ctx.channel.send("10초 땡! 자, 가셨습니다.")
+                gamers.remove(killed)
+                gamers_names.remove(mtn(killed))
+                await ctx.channel.send("10초 땡! 자, 가셨습니다.")
             
             if mafia>=doc+cop+norm:
                 await ctx.channel.send(":crescent_moon: 마피아의 승리입니다! :crescent_moon:")
