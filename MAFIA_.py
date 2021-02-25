@@ -18,6 +18,7 @@ doc_chat=0
 cop_chat=0
 people=[]
 gamers_same=[]
+spoken=False
 
 timers={}
 
@@ -40,11 +41,13 @@ def clear():
 async def start(ctx):
     global on_game
     global timers
+    global spoken
 
     timers[ctx.channel]=True
     await asyncio.sleep(600)
-    if timers[ctx.channel]==True and on_game==False:
+    if timers[ctx.channel]==True and on_game==False and spoken==False:
         await ctx.channel.send("10분간 활동이 없어 게임을 종료합니다.")
+        spoken=True
         clear()
 
 async def restart(ctx):
@@ -57,7 +60,8 @@ async def on_ready():
 
 @bot.command()
 async def 도움(ctx):
-    embed=discord.Embed(title="도움말", description="!도움: 이 메세지를 전송함\n\n!참가: 현재 마피아 게임에 참가하거나 새 게임을 시작함.\n\n!마피아: 개최자(게임을 시작한 사람)만 사용 가능. 게임을 시작.\n\n!참가자: 현재 참가자들을 보여줌.\n\n!탈주: ???:이타치가 왜 강한지 아나?\n\n")
+    embed=discord.Embed(title="도움말", color = discord.Colour.random(), description="!도움: 이 메세지를 전송함\n\n!참가: 현재 마피아 게임에 참가하거나 새 게임을 시작함.\n\n!마피아: 개최자(게임을 시작한 사람)만 사용 가능. 게임을 시작.\n\n!참가자: 현재 참가자들을 보여줌.\n\n!탈주: ???:이타치가 왜 강한지 아나?\n\n")
+    embed.set_thumbnail(url="https://ppss.kr/wp-content/uploads/2018/07/05-6-540x304.jpg")
     embed.add_field(name="특수 명령어", value="!지목: 마피아 채널의 마피아만 사용 가능. 마피아의 시간에 목표를 지목함.\n\n!치료: 의사 채널의 의사만 사용 가능. 지목한 사람을 살림.\n\n!조사: 경찰 채널의 경찰만 사용 가능. 지목한 사람이 마피아인지를 알려줌.", inline=False)
     embed.set_footer(text="10분간 대기상태에서 활동이 없을시 게임이 중지됨.")
     await ctx.channel.send(embed=embed)
@@ -69,6 +73,7 @@ async def 마피아(ctx):
     global gamers
     global gamers_names
     global gamers_same
+    global spoken
     txt=""
     if len(gamers)==0:
         await ctx.channel.send("아직 참가자가 없습니다.")
@@ -83,6 +88,7 @@ async def 마피아(ctx):
                     else:
                         on_game=True
                         gamers_same=gamers
+                        spoken=False
                         txt+=gamer.mention+"님과의 마피아 게임을 시작합니다.\n"
                         await ctx.channel.send(txt)
                         await game_start(ctx)
@@ -268,6 +274,8 @@ async def 참가자(ctx):
             txt+=mtn(gamer)+"님, "
         else:
             txt+=mtn(gamer)+"님과 함께하고 계십니다."
+    if txt=="":
+        txt="참가자가 아무도 없습니다."
     await ctx.channel.send(txt)
 
 '''
@@ -339,12 +347,6 @@ async def game_start(ctx):
     global gamers_same
 
     clear()
-
-    for member in ctx.channel.members:
-        await mafia_chat.set_permissions(member, read_messages=True, send_messages=True)
-        await doc_chat.set_permissions(member, read_messages=True, send_messages=True)
-        await cop_chat.set_permissions(member, read_messages=True, send_messages=True)
-    
     for channel in ctx.guild.channels:
         if str(channel.type)=="text":
             if channel.name=="mafia":
@@ -356,10 +358,6 @@ async def game_start(ctx):
 
     gamers_copy=gamers
 
-    mafia_chat=0
-    doc_chat=0
-    cop_chat=0
-
     for channel in ctx.guild.channels:
         if str(channel.type)=="text":
             if channel.name=="mafia":
@@ -368,6 +366,12 @@ async def game_start(ctx):
                 doc_chat=channel
             elif channel.name=="police":
                 cop_chat=channel
+
+    for member in ctx.channel.members:
+        await mafia_chat.set_permissions(member, read_messages=False, send_messages=False)
+        await doc_chat.set_permissions(member, read_messages=False, send_messages=False)
+        await cop_chat.set_permissions(member, read_messages=False, send_messages=False)
+
 
     global people
     people=randomassign()
@@ -450,7 +454,7 @@ async def game_start(ctx):
                     await ctx.channel.send("살리지 못하였습니다..")
                     gamers.remove(gamers[gamers_names.index(killed)])
                     gamers_names.remove(killed)
-                    await ctx.channel.send(killed.mention+"님께서 사망하셨습니다.")
+                    await ctx.channel.send(gamers[gamers_names.index(killed)].mention+"님께서 사망하셨습니다.")
             else:
                 await ctx.channel.send(gamers[gamers_names.index(killed)].mention+"님께서 사망하셨습니다.")
                 gamers.remove(gamers[gamers_names.index(killed)])
@@ -475,8 +479,8 @@ async def game_start(ctx):
             await ctx.channel.send("투표가 완료되었습니다! 총 "+str(done)+"표를 받으신 "+killed.mention+"님, 10초 안에 한마디 남기고 가시죠!")
             await asyncio.sleep(10)
             
-            gamer.remove(killed)
-            gamer_name.remove(mtn(killed))
+            gamers.remove(killed)
+            gamers_names.remove(mtn(killed))
             await ctx.channel.send("10초 땡! 자, 가셨습니다.")
             
             if mafia>=doc+cop+norm:
