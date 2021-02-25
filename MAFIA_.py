@@ -496,11 +496,11 @@ async def game_start(ctx):
 
     for member in gamers_same:
         if mafia!=0:
-            await mafia_chat.set_permissions(member, read_messages=True, send_messages=True)
+            await mafia_chat.set_permissions(member, read_messages=False, send_messages=False)
         if doc!=0:
-            await doc_chat.set_permissions(member, read_messages=True, send_messages=True)
+            await doc_chat.set_permissions(member, read_messages=False, send_messages=False)
         if cop!=0:
-            await cop_chat.set_permissions(member, read_messages=True, send_messages=True)
+            await cop_chat.set_permissions(member, read_messages=False, send_messages=False)
 
     clear()
 
