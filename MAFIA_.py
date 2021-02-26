@@ -18,9 +18,8 @@ doc_chat=0
 cop_chat=0
 people=[]
 gamers_same=[]
-spoken=False
 
-timers={}
+timerno=0
 
 def clear():
     global stage
@@ -40,18 +39,17 @@ def clear():
 
 async def start(ctx):
     global on_game
-    global timers
-    global spoken
+    global timerno
 
-    timers[ctx.channel]=True
+    localtimerno=0
+
+    timerno+=1
     await asyncio.sleep(600)
-    if timers[ctx.channel]==True and on_game==False and spoken==False:
-        await ctx.channel.send("10분간 활동이 없어 게임을 종료합니다.")
-        spoken=True
+    if localtimerno==timerno:
+        await ctx.channel.send("10분간 활동이 없어 게임이 삭제되었습니다.")
         clear()
 
 async def restart(ctx):
-    timers[ctx.channel]=False
     await start(ctx)
         
 @bot.event
