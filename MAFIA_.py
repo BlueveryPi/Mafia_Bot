@@ -60,9 +60,8 @@ async def on_ready():
 async def 도움(ctx):
     embed=discord.Embed(title="도움말", color = random.randint(0, 0xffffff), description="!도움: 이 메세지를 전송함\n\n!참가: 현재 마피아 게임에 참가하거나 새 게임을 시작함.\n\n!마피아: 개최자(게임을 시작한 사람)만 사용 가능. 게임을 시작.\n\n!참가자: 현재 참가자들을 보여줌.\n\n!탈주: ???:이타치가 왜 강한지 아나?\n\n")
     embed.set_thumbnail(url="https://ppss.kr/wp-content/uploads/2018/07/05-6-540x304.jpg")
-    embed.set_author(name="I_Love_Python", icon_url="https://thumbs.gfycat.com/VainHeartfeltBorzoi-size_restricted.gif")
     embed.add_field(name="특수 명령어", value="!지목: 마피아 채널의 마피아만 사용 가능. 마피아의 시간에 목표를 지목함.\n\n!치료: 의사 채널의 의사만 사용 가능. 지목한 사람을 살림.\n\n!조사: 경찰 채널의 경찰만 사용 가능. 지목한 사람이 마피아인지를 알려줌.", inline=False)
-    embed.set_footer(text="10분간 대기상태에서 활동이 없을시 게임이 중지됨.")
+    embed.set_footer(text="10분간 대기상태에서 활동이 없을시 게임이 중지됨.   Made by I_Love_Python")
     await ctx.channel.send(embed=embed)
 
 @bot.command()
@@ -80,7 +79,7 @@ async def 마피아(ctx):
     
     if ctx.message.author==gamers[0]:
         if on_game==False:
-            if len(gamers)>2:
+            if len(gamers)>0:
                 for gamer in gamers:
                     if gamers.index(gamer)!=len(gamers)-1:
                         txt+=gamer.mention+"님, "
@@ -136,6 +135,10 @@ async def 탈주(ctx):
         await ctx.channel.send((ctx.message.author).mention+"님은 게임에 참여하고 있지 않으십니다.")
 
 @bot.command()
+async def 히히(ctx):
+    await ctx.channel.send("아오 없는 커맨드 좀 그만보내 로그창이 시뻘개")
+
+@bot.command()
 async def 투표(ctx):
     global on_game
     global gamers
@@ -144,14 +147,17 @@ async def 투표(ctx):
 
     if on_game==True:
         if stage=="day":
-            if not(ctx.message.author in voted):
-                if ctx.message.mentions[0] in gamers:
-                    voted.append(ctx.message.author)
-                    votes[ctx.message.mentions[0]]+=1
+            if ctx.message.mentions!=[]:
+                if not(ctx.message.author in voted):
+                    if ctx.message.mentions[0] in gamers:
+                        voted.append(ctx.message.author)
+                        votes[ctx.message.mentions[0]]+=1
+                    else:
+                        await ctx.channel.send(ctx.message.mentions[0].mention+"님은 게임에 참가하지 않으셨습니다.")
                 else:
-                    await ctx.channel.send(ctx.message.mentions[0].mention+"님은 게임에 참가하지 않으셨습니다.")
+                    await ctx.channel.send(ctx.message.author.mention+"님께서는 이미 투표하셨습니다.")
             else:
-                await ctx.channel.send(ctx.message.author.mention+"님께서는 이미 투표하셨습니다.")
+                await ctx.channel.send("투표는 !투표 @누구누구 형식으로 해주세요")
         else:
             await ctx.channel.send("투표는 투표시간에!")
     else:
@@ -166,7 +172,7 @@ async def 지목(ctx):
     
     called=ctx.message.content.split(" ")
     if on_game==True:
-        if len(called)>0:
+        if len(called)>1:
             called=called[1]
         else:
             await ctx.channel.send("제대로 된 형식으로 지목해 주십시오.")
@@ -297,7 +303,7 @@ def add(lst):
     a=0
     for n in lst:
         a+=n
-    return n
+    return a
     
 def getoff(lst, lst2):
     for item in lst:
@@ -455,8 +461,6 @@ async def game_start(ctx):
                     gamers_names.remove(killed)
                     await ctx.channel.send(gamers[gamers_names.index(killed)].mention+"님께서 사망하셨습니다.")
             else:
-                print(gamers_names)
-                print(gamers)
                 await ctx.channel.send(gamers[gamers_names.index(killed)].mention+"님께서 사망하셨습니다.")
                 gamers.remove(gamers[gamers_names.index(killed)])
                 gamers_names.remove(killed)
